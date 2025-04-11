@@ -3,7 +3,7 @@ import { useState } from "react";
 
 export default function Downloader() {
   const [url, setUrl] = useState("");
-  const [quality, setQuality] = useState("720");
+  const [quality, setQuality] = useState("1080");
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -16,7 +16,6 @@ export default function Downloader() {
     setLoading(true);
     setStatus("Starting download...");
 
-    // 🔗 Open in new tab to let browser handle the file and name
     const downloadLink = `http://localhost:4000/download?url=${encodeURIComponent(
       url
     )}&quality=${quality}`;
@@ -27,22 +26,27 @@ export default function Downloader() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-700 text-white px-4">
-      <div className="w-full max-w-md bg-white/10 backdrop-blur-md p-8 rounded-2xl shadow-xl">
-        <h1 className="text-3xl font-bold mb-6 text-center text-white">
-          YouTube Video Downloader
+    <div className="w-screen h-screen bg-gradient-to-tr from-[#0f0c29] via-[#302b63] to-[#24243e] flex items-center justify-center relative overflow-hidden">
+      {/* Animated Background Glow */}
+      <div className="absolute w-[400px] h-[400px] bg-pink-500 rounded-full blur-[150px] opacity-30 animate-pulse top-10 left-10" />
+      <div className="absolute w-[400px] h-[400px] bg-purple-600 rounded-full blur-[150px] opacity-30 animate-pulse bottom-10 right-10" />
+
+      {/* Glass Card */}
+      <div className="w-full max-w-xl bg-white/10 backdrop-blur-md p-10 rounded-3xl shadow-2xl border border-white/20">
+        <h1 className="text-4xl font-bold mb-6 text-center text-white tracking-wide">
+          🎬 Ashish yt Downloader
         </h1>
 
         <input
           type="text"
           placeholder="Enter YouTube URL"
-          className="w-full px-4 py-2 rounded-lg bg-white text-black mb-4 outline-none"
+          className="w-full px-5 py-3 rounded-lg bg-white/90 text-black placeholder-gray-500 mb-4 outline-none shadow-inner focus:ring-2 focus:ring-red-400 transition"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
         />
 
         <select
-          className="w-full px-4 py-2 mb-4 rounded-lg text-black bg-white"
+          className="w-full px-5 py-3 mb-4 rounded-lg text-black bg-white/90 shadow-inner focus:ring-2 focus:ring-red-400 transition"
           value={quality}
           onChange={(e) => setQuality(e.target.value)}
         >
@@ -55,12 +59,14 @@ export default function Downloader() {
         <button
           onClick={handleDownload}
           disabled={loading}
-          className="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg font-semibold transition"
+          className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white py-3 rounded-lg font-semibold transition-all duration-200 shadow-lg hover:scale-105"
         >
           {loading ? "Downloading..." : "Download Video"}
         </button>
 
-        {status && <p className="text-sm mt-4 text-center">{status}</p>}
+        {status && (
+          <p className="text-sm mt-5 text-center text-gray-200">{status}</p>
+        )}
       </div>
     </div>
   );
