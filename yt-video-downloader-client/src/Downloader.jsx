@@ -30,7 +30,7 @@ export default function Downloader() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-700 text-white px-4">
       <div className="w-full max-w-md bg-white/10 backdrop-blur-md p-8 rounded-2xl shadow-xl">
         <h1 className="text-3xl font-bold mb-6 text-center text-white">
-          YouTube Video Downloader
+          Ashish yt Video Downloader
         </h1>
 
         <input
