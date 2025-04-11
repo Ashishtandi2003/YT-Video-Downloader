@@ -7,20 +7,20 @@ const path = require("path");
 const app = express();
 app.use(cors());
 
-// ✅ Sanitize filenames (cross-platform safe)
+// Clean/sanitize filenames for safe use
 const sanitize = (name) =>
   name
-    .replace(/[^a-zA-Z0-9 \-_]/g, "") // remove special chars
-    .replace(/\s+/g, "_")             // replace spaces with _
-    .substring(0, 100);               // limit filename length
+    .replace(/[^a-zA-Z0-9 \-_]/g, "")
+    .replace(/\s+/g, "_")
+    .substring(0, 100);
 
-app.get("/download", async (req, res) => {
+app.get("/download", (req, res) => {
   const videoURL = req.query.url;
   const quality = req.query.quality || "720";
 
   if (!videoURL) return res.status(400).send("Missing video URL");
 
-  // Step 1: Get sanitized title
+  // Step 1: get title
   exec(`yt-dlp --get-title "${videoURL}"`, (err, stdout) => {
     if (err) {
       console.error("❌ Failed to fetch title:", err);
@@ -31,14 +31,17 @@ app.get("/download", async (req, res) => {
     const filename = `${title}-${quality}p.mp4`;
     const filepath = path.resolve(filename);
 
-    // Step 2: Choose correct format
+    // Step 2: format selection
     let format;
-    if (quality === "1080") {
-      format = `bv*[height<=1080][ext=mp4]+ba[ext=m4a]/b[ext=mp4]`;
-    } else if (quality === "720") {
-      format = `bv*[height<=720][ext=mp4]+ba[ext=m4a]/b[ext=mp4]`;
-    } else {
-      format = `bestvideo+bestaudio/best`;
+    switch (quality) {
+      case "1080":
+        format = `bv*[height<=1080][ext=mp4]+ba[ext=m4a]/b[ext=mp4]`;
+        break;
+      case "720":
+        format = `bv*[height<=720][ext=mp4]+ba[ext=m4a]/b[ext=mp4]`;
+        break;
+      default:
+        format = `bestvideo+bestaudio/best`;
     }
 
     const command = `yt-dlp -f "${format}" -o "${filename}" "${videoURL}"`;
@@ -51,18 +54,18 @@ app.get("/download", async (req, res) => {
         return res.status(500).send("Download failed");
       }
 
-      // Step 4: Send file
+      // Step 4: Stream to client
       res.download(filepath, filename, (err) => {
         if (err) {
           console.error("📤 File send error:", err);
         }
 
-        // Step 5: Delete file after sending
+        // Step 5: Delete file
         fs.unlink(filepath, (unlinkErr) => {
           if (unlinkErr) {
-            console.warn("⚠️ File cleanup failed:", unlinkErr);
+            console.warn("⚠️ Cleanup failed:", unlinkErr);
           } else {
-            console.log("🧹 File deleted:", filepath);
+            console.log("🧹 File deleted:", filename);
           }
         });
       });
@@ -70,8 +73,7 @@ app.get("/download", async (req, res) => {
   });
 });
 
-// ✅ Start server
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 8080; // ✅ match Docker default
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });

@@ -16,7 +16,7 @@ export default function Downloader() {
     setLoading(true);
     setStatus("Starting download...");
 
-    const downloadLink = `http://localhost:4000/download?url=${encodeURIComponent(
+    const downloadLink = `https://yt-video-downloader-production-6c85.up.railway.app/download?url=${encodeURIComponent(
       url
     )}&quality=${quality}`;
     window.open(downloadLink, "_blank");
