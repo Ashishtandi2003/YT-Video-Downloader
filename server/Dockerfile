@@ -10,18 +10,15 @@ RUN apt-get update && \
 # Set working directory
 WORKDIR /app
 
-# Copy server package files and install dependencies
-COPY server/package*.json ./server/
-RUN cd server && npm install
+# Copy and install dependencies
+COPY package*.json ./
+RUN npm install
 
-# Copy the rest of the server code
-COPY server ./server
+# Copy the rest of the backend code
+COPY . .
 
-# Set working directory to server
-WORKDIR /app/server
-
-# Expose backend port
+# Expose the port
 EXPOSE 8080
 
-# Start the backend server
+# Start the server
 CMD ["node", "server.js"]
