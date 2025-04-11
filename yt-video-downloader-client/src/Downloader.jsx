@@ -16,10 +16,12 @@ export default function Downloader() {
     setLoading(true);
     setStatus("Starting download...");
 
-    // 🔗 Open in new tab to let browser handle the file and name
-    const downloadLink = `http://localhost:4000/download?url=${encodeURIComponent(
+    // ✅ Replace this with your actual deployed Render backend URL
+    const downloadLink = `https://yt-video-downloader-backend.onrender.com/download?url=${encodeURIComponent(
       url
     )}&quality=${quality}`;
+
+    // Open in new tab so browser handles download
     window.open(downloadLink, "_blank");
 
     setStatus("⏳ Download started in new tab. Check your downloads.");
