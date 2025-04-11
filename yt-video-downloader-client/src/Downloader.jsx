@@ -16,12 +16,10 @@ export default function Downloader() {
     setLoading(true);
     setStatus("Starting download...");
 
-    // ✅ Replace this with your actual deployed Render backend URL
-    const downloadLink = `https://yt-video-downloader-backend.onrender.com/download?url=${encodeURIComponent(
+    // 🔗 Open in new tab to let browser handle the file and name
+    const downloadLink = `http://localhost:4000/download?url=${encodeURIComponent(
       url
     )}&quality=${quality}`;
-
-    // Open in new tab so browser handles download
     window.open(downloadLink, "_blank");
 
     setStatus("⏳ Download started in new tab. Check your downloads.");
@@ -32,7 +30,7 @@ export default function Downloader() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-700 text-white px-4">
       <div className="w-full max-w-md bg-white/10 backdrop-blur-md p-8 rounded-2xl shadow-xl">
         <h1 className="text-3xl font-bold mb-6 text-center text-white">
-          Ashish yt Video Downloader
+          YouTube Video Downloader
         </h1>
 
         <input
