@@ -7,31 +7,32 @@ const path = require("path");
 const app = express();
 app.use(cors());
 
-// 🧼 Clean file names
-function sanitize(name) {
-  return name.replace(/[<>:"/\\|?*\x00-\x1F]/g, "").slice(0, 100);
-}
+// ✅ Sanitize filenames (cross-platform safe)
+const sanitize = (name) =>
+  name
+    .replace(/[^a-zA-Z0-9 \-_]/g, "") // remove special chars
+    .replace(/\s+/g, "_")             // replace spaces with _
+    .substring(0, 100);               // limit filename length
 
 app.get("/download", async (req, res) => {
   const videoURL = req.query.url;
-  const quality = req.query.quality || "720"; // default quality
+  const quality = req.query.quality || "720";
 
-  if (!videoURL) {
-    return res.status(400).send("Missing video URL");
-  }
+  if (!videoURL) return res.status(400).send("Missing video URL");
 
-  // Step 1: get title using yt-dlp
+  // Step 1: Get sanitized title
   exec(`yt-dlp --get-title "${videoURL}"`, (err, stdout) => {
     if (err) {
-      console.error("Failed to fetch title:", err);
+      console.error("❌ Failed to fetch title:", err);
       return res.status(500).send("Error fetching title");
     }
 
     const title = sanitize(stdout.trim());
-    const outputFile = `${title}-${quality}p.mp4`;
+    const filename = `${title}-${quality}p.mp4`;
+    const filepath = path.resolve(filename);
 
-    // format selector based on quality
-    let format = '';
+    // Step 2: Choose correct format
+    let format;
     if (quality === "1080") {
       format = `bv*[height<=1080][ext=mp4]+ba[ext=m4a]/b[ext=mp4]`;
     } else if (quality === "720") {
@@ -40,23 +41,37 @@ app.get("/download", async (req, res) => {
       format = `bestvideo+bestaudio/best`;
     }
 
-    const command = `yt-dlp -f "${format}" -o "${outputFile}" "${videoURL}"`;
+    const command = `yt-dlp -f "${format}" -o "${filename}" "${videoURL}"`;
+    console.log("▶️ Running:", command);
 
-    exec(command, (error, stdout, stderr) => {
+    // Step 3: Download video
+    exec(command, (error) => {
       if (error) {
-        console.error("Download error:", error.message);
+        console.error("❌ Download error:", error.message);
         return res.status(500).send("Download failed");
       }
 
-      const filePath = path.join(__dirname, outputFile);
-      res.download(filePath, outputFile, (err) => {
-        if (err) console.error("File send error:", err);
-        fs.unlink(filePath, () => {}); // clean up
+      // Step 4: Send file
+      res.download(filepath, filename, (err) => {
+        if (err) {
+          console.error("📤 File send error:", err);
+        }
+
+        // Step 5: Delete file after sending
+        fs.unlink(filepath, (unlinkErr) => {
+          if (unlinkErr) {
+            console.warn("⚠️ File cleanup failed:", unlinkErr);
+          } else {
+            console.log("🧹 File deleted:", filepath);
+          }
+        });
       });
     });
   });
 });
 
-app.listen(4000, () => {
-  console.log("🚀 Server running at http://localhost:4000");
+// ✅ Start server
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
