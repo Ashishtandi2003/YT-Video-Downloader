@@ -27,7 +27,7 @@ export default function Downloader() {
     )}&${query}`;
 
     window.open(downloadLink, "_blank");
-    setStatus("⏳ Download started in new tab. Check your downloads.");
+    setStatus("⏳ Download started in new tab. Check your download.");
     setLoading(false);
   };
 
