@@ -8,7 +8,8 @@ RUN apt-get update && \
     chmod a+rx /usr/local/bin/yt-dlp
 
 # Set working directory
-WORKDIR /
+WORKDIR /app
+
 
 # Copy and install dependencies
 COPY package*.json ./
