@@ -44,7 +44,10 @@ app.get("/download", async (req, res) => {
     const command = `yt-dlp -f "${format}" -o "${filename}" "${videoURL}"`;
     console.log("▶️ Running:", command);
 
-    exec(command, (error) => {
+    exec(command, (error, stdout, stderr) => {
+      console.log("yt-dlp stdout:", stdout);
+      console.error("yt-dlp stderr:", stderr);
+    
       if (error) {
         console.error("❌ Download error:", error.message);
         return res.status(500).send("Download failed");
