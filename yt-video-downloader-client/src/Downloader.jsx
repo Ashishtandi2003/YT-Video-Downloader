@@ -7,6 +7,8 @@ export default function Downloader() {
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const backendURL = import.meta.env.VITE_BACKEND_URL;
+
   const handleDownload = () => {
     if (!url) {
       setStatus("Please enter a YouTube URL.");
@@ -16,7 +18,7 @@ export default function Downloader() {
     setLoading(true);
     setStatus("Starting download...");
 
-    const downloadLink = `https://yt-video-downloader-production-6c85.up.railway.app/download?url=${encodeURIComponent(
+    const downloadLink = `${backendURL}/download?url=${encodeURIComponent(
       url
     )}&quality=${quality}`;
     window.open(downloadLink, "_blank");
